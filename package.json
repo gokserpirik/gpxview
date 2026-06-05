@@ -2,6 +2,7 @@
   "name": "gpxview",
   "version": "0.1.0",
   "description": "GPX file visualizer with an F1 broadcast-inspired dark theme. Drag-and-drop GPX files to see speed-colored routes, sector timing, and activity stats.",
+  "packageManager": "pnpm@10.14.0",
   "private": true,
   "type": "module",
   "imports": {
