@@ -57,14 +57,14 @@ export default function HomePage() {
           <div className="mx-auto max-w-5xl text-center">
             <div className="mb-4 inline-flex items-center gap-2 rounded-sm bg-[var(--f1-red)] px-3 py-1.5 text-sm font-mono font-bold uppercase tracking-wider text-white">
               <Bike className="size-4" />
-              <span>GPX Viewer</span>
+              <span>GPX Telemetry</span>
             </div>
             <h1 className="text-4xl font-bold text-foreground sm:text-5xl md:text-6xl font-sans">
-              Visualize Your{' '}
-              <span className="text-[var(--f1-red)]">Activities</span>
+              Analyze Your{' '}
+              <span className="text-[var(--f1-red)]">Session Telemetry</span>
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground font-mono">
-              Upload a GPX file to see your route on the map, analyze performance stats.
+              Upload a GPX session file to project your track layout, analyze speed and elevation telemetry, and inspect sector performance.
             </p>
           </div>
         </section>
@@ -73,7 +73,7 @@ export default function HomePage() {
           <div className="mx-auto max-w-6xl">
             <div className="inline-flex items-center gap-1.5 rounded-sm bg-[var(--f1-red)] px-2 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider text-white">
               <Bike className="size-3" />
-              <span>GPX Viewer</span>
+              <span>GPX Telemetry</span>
             </div>
           </div>
         </section>

@@ -21,6 +21,12 @@ export default function Header() {
           >
             Home
           </Link>
+          <Link
+            to="/how-to"
+            className="text-xs font-mono font-semibold uppercase tracking-wider text-muted-foreground transition hover:text-foreground no-underline"
+          >
+            Guide
+          </Link>
           <span className="text-xs text-muted-foreground/40 font-mono">v0.1</span>
         </div>
       </nav>
