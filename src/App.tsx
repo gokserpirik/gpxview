@@ -5,7 +5,7 @@ import HowToPage from '#/routes/HowToPage'
 
 export default function App() {
   return (
-    <BrowserRouter basename="/gpxview/">
+    <BrowserRouter basename="/">
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
