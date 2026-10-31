@@ -1,5 +1,5 @@
 export { parseGpx, isGpxFile } from './parser'
-export { calculateStats, haversineDistance, formatDuration, computeSectors, speedSegmentColor, SPEED_COLORS } from './math'
+export { calculateStats, calculateSegmentStats, haversineDistance, formatDuration, computeSectors, speedSegmentColor, SPEED_COLORS } from './math'
 export type {
   TrackPoint,
   GpxTrack,

@@ -8,6 +8,7 @@ export interface TrackPoint {
 export interface GpxTrack {
   name: string
   points: TrackPoint[]
+  segments: TrackPoint[][]
   stats: TrackStats
 }
 
@@ -41,6 +42,7 @@ export interface TrackStats {
   avgElevation: number | null
   movingTime: number // seconds
   avgSpeedKmh: number
+  /** Median of the fastest 5% of valid interval speeds. */
   maxSpeedKmh: number
   /** Median segment speed — robust reference for speed coloring */
   medianSpeedKmh: number

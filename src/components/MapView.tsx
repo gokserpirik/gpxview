@@ -37,12 +37,12 @@ export default function MapView({ tracks, className = '' }: MapViewProps) {
         zoom: 2,
       })
 
-      // CartoDB Dark Matter tiles
+      // OpenStreetMap raster tiles
       L.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
         {
           attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
           maxZoom: 19,
         },
       ).addTo(map)
@@ -66,7 +66,7 @@ export default function MapView({ tracks, className = '' }: MapViewProps) {
   useEffect(() => {
     const L = LRef.current
     const map = mapInstanceRef.current
-    if (!L || !map || tracks.length === 0) return
+    if (!L || !map) return
 
     map.invalidateSize()
 
@@ -82,9 +82,8 @@ export default function MapView({ tracks, className = '' }: MapViewProps) {
     const allBounds: [number, number][] = []
 
     tracks.forEach((track) => {
-      if (track.points.length < 2) return
-
-      const pts = track.points
+      track.segments.forEach((pts) => {
+      if (pts.length < 2) return
 
       // Compute sectors — each gets a color based on its avg speed vs max
       const sectors = computeSectors(pts, 3)
@@ -106,6 +105,7 @@ export default function MapView({ tracks, className = '' }: MapViewProps) {
           _isGpxOverlay: true,
         }).addTo(map)
       }
+      })
     })
 
     if (allBounds.length > 0) {

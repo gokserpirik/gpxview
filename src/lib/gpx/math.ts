@@ -33,9 +33,15 @@ export function haversineDistance(
  * Calculate track statistics from a list of points.
  *
  * Handles missing elevation (reports null instead of 0).
- * Filters GPS noise spikes for max speed.
+ * Ignores implausible GPS jumps above 200 km/h in speed and moving-time metrics.
  */
 export function calculateStats(points: TrackPoint[]): TrackStats {
+  return calculateSegmentStats([points])
+}
+
+/** Calculate statistics without connecting separate tracks or segments. */
+export function calculateSegmentStats(pointSegments: TrackPoint[][]): TrackStats {
+  const points = pointSegments.flat()
   const hasElevation = points.some((p) => p.ele !== null)
 
   let elevationGain: number | null = null
@@ -47,8 +53,8 @@ export function calculateStats(points: TrackPoint[]): TrackStats {
   if (hasElevation) {
     const validElev = points.filter((p): p is TrackPoint & { ele: number } => p.ele !== null)
     const eleValues = validElev.map((p) => p.ele)
-    maxElevation = Math.max(...eleValues)
-    minElevation = Math.min(...eleValues)
+    maxElevation = eleValues.reduce((max, value) => Math.max(max, value), -Infinity)
+    minElevation = eleValues.reduce((min, value) => Math.min(min, value), Infinity)
 
     const sum = eleValues.reduce((a, b) => a + b, 0)
     avgElevation = Math.round(sum / eleValues.length)
@@ -56,10 +62,15 @@ export function calculateStats(points: TrackPoint[]): TrackStats {
     // Gain/loss from consecutive elevation deltas
     let gain = 0
     let loss = 0
-    for (let i = 1; i < validElev.length; i++) {
-      const diff = validElev[i].ele - validElev[i - 1].ele
-      if (diff > 0) gain += diff
-      else loss += Math.abs(diff)
+    for (const segment of pointSegments) {
+      for (let i = 1; i < segment.length; i++) {
+        const previous = segment[i - 1].ele
+        const current = segment[i].ele
+        if (previous === null || current === null) continue
+        const diff = current - previous
+        if (diff > 0) gain += diff
+        else loss += Math.abs(diff)
+      }
     }
     elevationGain = Math.round(gain)
     elevationLoss = Math.round(loss)
@@ -72,19 +83,21 @@ export function calculateStats(points: TrackPoint[]): TrackStats {
   let totalDistance = 0
   const segments: { dist: number; timeSec: number }[] = []
 
-  for (let i = 1; i < points.length; i++) {
-    const prev = points[i - 1]
-    const curr = points[i]
-    const dist = haversineDistance(prev.lat, prev.lon, curr.lat, curr.lon)
-    totalDistance += dist
+  for (const pointSegment of pointSegments) {
+    for (let i = 1; i < pointSegment.length; i++) {
+      const prev = pointSegment[i - 1]
+      const curr = pointSegment[i]
+      const dist = haversineDistance(prev.lat, prev.lon, curr.lat, curr.lon)
+      totalDistance += dist
 
-    if (curr.time && prev.time) {
-      const timeSec = (curr.time.getTime() - prev.time.getTime()) / 1000
-      if (timeSec > 0 && timeSec < 120) {
-        const speedKmh = (dist / 1000) / (timeSec / 3600)
-        // Filter impossible speeds: > 40 km/h is GPS noise
-        if (speedKmh <= 40) {
-          segments.push({ dist, timeSec })
+      if (curr.time && prev.time) {
+        const timeSec = (curr.time.getTime() - prev.time.getTime()) / 1000
+        if (timeSec > 0 && timeSec < 120) {
+          const speedKmh = (dist / 1000) / (timeSec / 3600)
+          // Allow fast cycling while excluding extreme GPS jumps.
+          if (speedKmh <= 200) {
+            segments.push({ dist, timeSec })
+          }
         }
       }
     }
@@ -99,15 +112,8 @@ export function calculateStats(points: TrackPoint[]): TrackStats {
       movingTime += s.timeSec
     }
   }
-  // Fallback: total elapsed time
-  if (movingTime === 0 && points.length > 1 && points[0].time && points[points.length - 1].time) {
-    movingTime = Math.max(
-      (points[points.length - 1].time!.getTime() - points[0].time!.getTime()) / 1000,
-      0,
-    )
-  }
 
-  // Speed stats — use median of top 5% for max speed to filter GPS noise
+  // Average moving speed is distance divided by time for moving intervals.
   let avgSpeedKmh = 0
   let maxSpeedKmh = 0
   let medianSpeedKmh = 0
@@ -116,10 +122,11 @@ export function calculateStats(points: TrackPoint[]): TrackStats {
     const speedsKmh = segments.map(
       (s) => (s.dist / 1000) / (s.timeSec / 3600),
     )
-    avgSpeedKmh =
-      Math.round(
-        (speedsKmh.reduce((a, b) => a + b, 0) / speedsKmh.length) * 100,
-      ) / 100
+    const movingSegments = segments.filter((s) => s.dist / s.timeSec > 0.14)
+    const movingDistance = movingSegments.reduce((sum, s) => sum + s.dist, 0)
+    avgSpeedKmh = movingTime > 0
+      ? Math.round((movingDistance / movingTime) * 3.6 * 100) / 100
+      : 0
 
     // Sort descending, take top 5%, return median of that slice
     const sorted = [...speedsKmh].sort((a, b) => b - a)

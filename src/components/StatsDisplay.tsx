@@ -32,16 +32,16 @@ function TimingPanel({ label, value }: { label: string; value: string }) {
 }
 
 export default function StatsDisplay({ stats, tracks }: StatsDisplayProps) {
-  const allPoints = tracks?.flatMap((t) => t.points) ?? []
-  const sectors = tracks && allPoints.length > 0
-    ? computeSectors(allPoints, 3)
+  const segments = tracks?.flatMap((t) => t.segments).filter((segment) => segment.length > 1) ?? []
+  const sectors = segments.length === 1
+    ? computeSectors(segments[0], 3)
     : []
 
   const mainStats = [
     { label: 'Distance', value: `${stats.distanceKm.toFixed(2)} km` },
-    { label: 'Time', value: formatDuration(stats.movingTime) },
+    { label: 'Moving Time', value: stats.movingTime > 0 ? formatDuration(stats.movingTime) : '--' },
     { label: 'Avg Speed', value: `${fmtSpeed(stats.avgSpeedKmh)} km/h` },
-    { label: 'Max Speed', value: `${fmtSpeed(stats.maxSpeedKmh)} km/h` },
+    { label: 'Peak Speed*', value: `${fmtSpeed(stats.maxSpeedKmh)} km/h` },
     { label: 'Elev Gain', value: fmt(stats.elevationGain, 'm') },
     { label: 'Elev Loss', value: fmt(stats.elevationLoss, 'm') },
     { label: 'Max Elev', value: fmt(stats.maxElevation, 'm') },
@@ -58,6 +58,11 @@ export default function StatsDisplay({ stats, tracks }: StatsDisplayProps) {
           <TimingPanel key={s.label} label={s.label} value={s.value} />
         ))}
       </div>
+
+      <p className="text-xs text-muted-foreground">
+        *Peak speed is the median of the fastest 5% of valid intervals, not the absolute maximum.
+        Intervals of 2 minutes or longer and speeds over 200 km/h are excluded from speed and moving-time calculations.
+      </p>
 
       {/* Sector timing strip — info row */}
       {sectors.length > 0 && (

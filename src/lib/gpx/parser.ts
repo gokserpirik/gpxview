@@ -1,5 +1,5 @@
 import type { TrackPoint, GpxTrack, GpxRoute, GpxWaypoint, GpxData, TrackStats } from './types'
-import { calculateStats } from './math'
+import { calculateStats, calculateSegmentStats } from './math'
 
 /**
  * Parse a GPX XML string into structured data using the browser's native DOMParser.
@@ -22,6 +22,9 @@ export function parseGpx(xmlString: string): GpxData {
   if (parseError) {
     throw new Error(`Invalid XML: ${parseError.textContent}`)
   }
+  if (xmlDoc.documentElement.localName !== 'gpx') {
+    throw new Error('Invalid GPX file: expected a gpx root element.')
+  }
 
   const name = getElementValue(xmlDoc.documentElement, 'name') || 'Unnamed Activity'
   const tracks = parseTracks(xmlDoc)
@@ -29,8 +32,8 @@ export function parseGpx(xmlString: string): GpxData {
   const waypoints = parseWaypoints(xmlDoc)
 
   // Compute overall stats across all tracks
-  const allPoints = tracks.flatMap((t) => t.points)
-  const totalStats = allPoints.length > 0 ? calculateStats(allPoints) : defaultStats()
+  const segments = tracks.flatMap((t) => t.segments)
+  const totalStats = segments.length > 0 ? calculateSegmentStats(segments) : defaultStats()
 
   return { name, tracks, routes, waypoints, totalStats }
 }
@@ -39,9 +42,10 @@ function parseTracks(xmlDoc: XMLDocument): GpxTrack[] {
   const trkElements = xmlDoc.getElementsByTagName('trk')
   return Array.from(trkElements).map((trk) => {
     const name = getElementValue(trk, 'name') || 'Unnamed Track'
-    const points = parseTrackPoints(trk)
-    const stats = calculateStats(points)
-    return { name, points, stats }
+    const segments = parseTrackSegments(trk)
+    const points = segments.flat()
+    const stats = calculateSegmentStats(segments)
+    return { name, points, segments, stats }
   })
 }
 
@@ -59,8 +63,8 @@ function parseWaypoints(xmlDoc: XMLDocument): GpxWaypoint[] {
   const wptElements = xmlDoc.getElementsByTagName('wpt')
   return Array.from(wptElements).map((wpt) => ({
     name: getElementValue(wpt, 'name') || 'Unnamed Waypoint',
-    lat: parseFloat(wpt.getAttribute('lat') || '0'),
-    lon: parseFloat(wpt.getAttribute('lon') || '0'),
+    lat: parseCoordinate(wpt, 'lat'),
+    lon: parseCoordinate(wpt, 'lon'),
     ele: parseOptionalNumber(wpt, 'ele'),
     time: parseOptionalDate(wpt, 'time'),
     comment: getElementValue(wpt, 'cmt') || undefined,
@@ -68,13 +72,13 @@ function parseWaypoints(xmlDoc: XMLDocument): GpxWaypoint[] {
   }))
 }
 
-function parseTrackPoints(trk: Element): TrackPoint[] {
+function parseTrackSegments(trk: Element): TrackPoint[][] {
   const trksegElements = trk.getElementsByTagName('trkseg')
   if (trksegElements.length > 0) {
-    return Array.from(trksegElements).flatMap((seg) => parsePointsFromContainer(seg))
+    return Array.from(trksegElements).map((seg) => parsePointsFromContainer(seg))
   }
   // Fallback for tracks without segments
-  return parsePointsFromContainer(trk)
+  return [parsePointsFromContainer(trk)]
 }
 
 function parseRoutePoints(rte: Element): TrackPoint[] {
@@ -87,8 +91,8 @@ function parsePointsFromContainer(
 ): TrackPoint[] {
   const elements = container.getElementsByTagName(tagName)
   return Array.from(elements).map((el) => ({
-    lat: parseFloat(el.getAttribute('lat') || '0'),
-    lon: parseFloat(el.getAttribute('lon') || '0'),
+    lat: parseCoordinate(el, 'lat'),
+    lon: parseCoordinate(el, 'lon'),
     ele: parseOptionalNumber(el, 'ele'),
     time: parseOptionalDate(el, 'time'),
   }))
@@ -101,12 +105,28 @@ function getElementValue(parent: Element, tagName: string): string | null {
 
 function parseOptionalNumber(parent: Element, tagName: string): number | null {
   const val = getElementValue(parent, tagName)
-  return val !== null ? parseFloat(val) : null
+  if (val === null) return null
+  const number = val.trim() === '' ? NaN : Number(val)
+  if (!Number.isFinite(number)) throw new Error(`Invalid GPX ${tagName} value.`)
+  return number
 }
 
 function parseOptionalDate(parent: Element, tagName: string): Date | null {
   const val = getElementValue(parent, tagName)
-  return val !== null ? new Date(val) : null
+  if (val === null) return null
+  const date = new Date(val)
+  if (!Number.isFinite(date.getTime())) throw new Error(`Invalid GPX ${tagName} value.`)
+  return date
+}
+
+function parseCoordinate(element: Element, name: 'lat' | 'lon'): number {
+  const value = element.getAttribute(name)
+  const number = value === null || value.trim() === '' ? NaN : Number(value)
+  const limit = name === 'lat' ? 90 : 180
+  if (!Number.isFinite(number) || number < -limit || number > limit) {
+    throw new Error(`Invalid or missing GPX ${name} coordinate in ${element.localName}.`)
+  }
+  return number
 }
 
 function defaultStats(): TrackStats {

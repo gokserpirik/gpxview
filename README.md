@@ -19,7 +19,7 @@
 ## ✨ Features
 
 - **GPX File Parsing** — Drag-and-drop or click to upload. Browser-native parser, zero server needed.
-- **Interactive Map** — Speed-colored track segments (yellow → green → purple, like F1 timing). CartoDB Dark Matter tiles.
+- **Interactive Map** — Speed-colored track segments (yellow → green → purple, like F1 timing). OpenStreetMap tiles.
 - **Timing-Tower Stats** — Distance, moving time, avg/max speed, elevation gain/loss, pace — all in F1 broadcast style.
 - **3-Sector Timing** — Track split into three equal sectors with distance and average speed per sector.
 - **Waypoints & Multi-Track** — Handle multiple tracks and named waypoints.
@@ -31,6 +31,7 @@
 # Requirements: Node.js 22+, pnpm
 pnpm install
 pnpm dev       # starts dev server on :3000
+pnpm test      # runs GPX parser and statistics tests
 pnpm build     # produces static dist/
 pnpm preview   # preview the built site
 ```
@@ -73,7 +74,7 @@ Any GPX file from a GPS watch, phone app, or fitness tracker works. Files with e
 | Build | Vite 8 |
 | Routing | react-router-dom |
 | Styling | Tailwind CSS v4 + CSS variables |
-| Maps | Leaflet + CartoDB Dark Matter tiles |
+| Maps | Leaflet + OpenStreetMap tiles |
 | GPX | Custom zero-dependency parser (browser DOMParser) |
 | Icons | lucide-react |
 
