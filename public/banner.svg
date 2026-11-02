@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
+  <title id="title">GPX Fitness Viewer</title>
+  <desc id="desc">GPS track analysis with a racing-inspired route graphic.</desc>
+  <defs>
+    <linearGradient id="background" x2="1" y2="1"><stop stop-color="#181b20"/><stop offset="1" stop-color="#08090b"/></linearGradient>
+    <linearGradient id="route" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#f5c945"/><stop offset=".48" stop-color="#54d991"/><stop offset="1" stop-color="#b588ff"/></linearGradient>
+    <pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse"><path d="M36 0H0V36" fill="none" stroke="#ffffff" stroke-opacity=".045"/></pattern>
+    <path id="track" d="M705 255 C750 252 743 206 786 206 S832 248 866 222 852 160 897 148 949 180 981 155 1004 87 1055 101 1081 144 1134 122"/>
+  </defs>
+  <rect width="1200" height="360" rx="12" fill="url(#background)"/>
+  <rect width="1200" height="360" rx="12" fill="url(#grid)"/>
+  <path d="M0 0h1200v5H0z" fill="#e33b36"/>
+  <path d="M624 0h2v360h-2z" fill="#fff" opacity=".08"/>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
+    <text x="64" y="74" fill="#f05b53" font-size="14" font-weight="700" letter-spacing="3">YOUR ROUTE. YOUR TELEMETRY.</text>
+    <text x="60" y="155" fill="#f4f4f2" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="55" font-weight="800" letter-spacing="-2">GPX FITNESS</text>
+    <text x="62" y="207" fill="#f4f4f2" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="55" font-weight="800" letter-spacing="-2">VIEWER<tspan fill="#e33b36">.</tspan></text>
+    <text x="64" y="257" fill="#a6a8ad" font-size="16">Visualize your tracks. Analyze every sector.</text>
+    <text x="64" y="314" fill="#777b82" font-size="12" letter-spacing="2">GPS  /  PERFORMANCE  /  EXPLORATION</text>
+    <text x="697" y="74" fill="#888c93" font-size="12" letter-spacing="2">TRACK VISUALIZATION</text>
+    <text x="697" y="314" fill="#888c93" font-size="12" letter-spacing="2">SLOWER</text>
+    <path d="M772 309h105" stroke="url(#route)" stroke-width="4" stroke-linecap="round"/>
+    <text x="894" y="314" fill="#888c93" font-size="12" letter-spacing="2">FASTER</text>
+  </g>
+  <use href="#track" fill="none" stroke="#000" stroke-opacity=".45" stroke-width="16" stroke-linecap="round"/>
+  <use href="#track" fill="none" stroke="url(#route)" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="705" cy="255" r="6" fill="#f5c945"/>
+  <circle cx="1134" cy="122" r="6" fill="#b588ff"/>
+  <circle r="5" fill="#fff">
+    <animateMotion dur="9s" repeatCount="indefinite" path="M705 255 C750 252 743 206 786 206 S832 248 866 222 852 160 897 148 949 180 981 155 1004 87 1055 101 1081 144 1134 122"/>
+  </circle>
+</svg>

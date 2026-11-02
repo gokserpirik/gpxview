@@ -1,5 +1,7 @@
 <div align="center">
 
+![GPX Fitness Viewer banner](public/banner.svg)
+
 ![Version][version-badge]
 ![GitHub Pages][gh-pages-badge]
 ![License][license-badge]
