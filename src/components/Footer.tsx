@@ -1,16 +1,13 @@
-export default function Footer() {
-  const year = new Date().getFullYear()
+import { HStack } from '@astryxdesign/core/HStack'
+import { Text } from '@astryxdesign/core/Text'
 
+export default function Footer() {
   return (
-    <footer className="mt-20 border-t border-border px-6 py-6">
-      <div className="mx-auto flex max-w-6xl items-center justify-between">
-        <p className="text-xs font-mono text-muted-foreground">
-          &copy; {year} GPX Fitness Viewer
-        </p>
-        <p className="text-xs font-mono text-muted-foreground/50">
-          F1 Broadcast Theme
-        </p>
-      </div>
+    <footer className="pit-footer">
+      <HStack gap={4} hAlign="between" wrap="wrap" className="pit-container">
+        <Text type="supporting">© {new Date().getFullYear()} GPX Fitness Viewer</Text>
+        <Text type="supporting">LOCAL FILE · NO UPLOAD TO A SERVER</Text>
+      </HStack>
     </footer>
   )
 }

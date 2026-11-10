@@ -1,4 +1,11 @@
-@import 'tailwindcss';
+@layer reset, theme, base, astryx-base, astryx-theme, components, utilities;
+
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/preflight.css' layer(base);
+@import '@astryxdesign/core/reset.css';
+@import '@astryxdesign/core/astryx.css';
+@import '@astryxdesign/core/tailwind-theme.css';
+@import 'tailwindcss/utilities.css' layer(utilities);
 
 @plugin "tailwindcss-animate";
 
@@ -128,11 +135,168 @@ body {
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  font-family: var(--font-family-code, 'JetBrains Mono', monospace);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+}
+
+/* Pit Wall: the existing guide keeps its legacy styles while the activity
+   workspace reads its colors from the built Astryx theme. */
+.pit-page { background: var(--color-background-body); color: var(--color-text-primary); min-height: calc(100vh - 9rem); }
+.pit-container { width: min(100% - 3rem, 86rem); margin-inline: auto; }
+.pit-page > .pit-container { padding-block: 3rem 5rem; }
+.pit-page-heading { padding-bottom: 1.5rem; border-bottom: 1px solid var(--color-border); }
+.pit-page-heading h1 { font-size: clamp(1.75rem, 3vw, 2.5rem); letter-spacing: -0.035em; }
+.pit-page-heading [data-type="supporting"] { color: var(--color-text-secondary); }
+
+.pit-site-header { position: relative; z-index: 500; background: var(--color-background-body); border-bottom: 1px solid var(--color-border); }
+.pit-nav { width: min(100% - 3rem, 86rem); margin-inline: auto; min-height: 4.25rem; }
+.pit-brand { display: inline-flex; align-items: center; gap: .75rem; color: var(--color-text-primary); text-decoration: none; letter-spacing: .08em; white-space: nowrap; }
+.pit-brand strong { font-weight: 800; }
+.pit-brand-mark { display: block; width: .7rem; height: 1.5rem; background: var(--color-accent); transform: skew(-16deg); }
+.pit-nav-link { color: var(--color-text-secondary); text-decoration: none; font-size: .875rem; font-weight: 600; padding-block: 1.4rem; border-bottom: 2px solid transparent; white-space: nowrap; }
+.pit-nav-link:hover, .pit-nav-link:focus-visible { color: var(--color-text-primary); }
+.pit-nav-active { color: var(--color-text-primary); border-bottom-color: var(--color-accent); }
+
+.pit-empty-grid { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); min-height: 34rem; border: 1px solid var(--color-border); background: var(--color-background-surface); }
+.pit-dropzone { display: flex; align-items: center; padding: clamp(2rem, 5vw, 5rem); border-right: 1px dashed var(--color-border); transition: background-color .25s ease, box-shadow .25s ease; }
+.pit-dropzone:hover, .pit-dropzone-active { background: color-mix(in oklab, var(--color-accent) 8%, var(--color-background-surface)); box-shadow: inset 0 0 0 2px var(--color-accent); }
+.pit-dropzone [data-type="display-3"] { font-size: clamp(2.2rem, 4vw, 3.75rem); line-height: 1.05; letter-spacing: -.035em; font-weight: 750; max-width: 12ch; }
+.pit-dropzone [data-type="body"] { max-width: 40ch; line-height: 1.6; }
+.pit-preview { overflow: hidden; padding: 1.5rem 1.75rem 1rem; background: color-mix(in oklab, var(--color-background-surface) 88%, var(--color-background-body)); }
+.pit-preview > :first-child { color: var(--color-text-secondary); font-family: var(--font-family-code); font-size: .7rem; letter-spacing: .09em; }
+.pit-preview-map { width: 100%; height: auto; min-height: 23rem; flex: 1; }
+.pit-grid-line { stroke: var(--color-border); stroke-width: .7; }
+.pit-route-slow, .pit-route-medium, .pit-route-fast { fill: none; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+.pit-route-slow { stroke: var(--color-speed-slow); }
+.pit-route-medium { stroke: var(--color-speed-medium); }
+.pit-route-fast { stroke: var(--color-speed-fast); }
+.pit-route-start { fill: var(--color-accent); stroke: var(--color-text-primary); stroke-width: 2; }
+.pit-route-start-ring { fill: none; stroke: var(--color-accent); stroke-width: 1; opacity: .7; }
+.pit-route-node { fill: var(--color-background-surface); stroke: var(--color-text-primary); stroke-width: 2; }
+.pit-legend, .pit-map-legend { color: var(--color-text-secondary); font-family: var(--font-family-code); letter-spacing: .08em; }
+.pit-legend > :nth-child(1), .pit-map-legend > :nth-child(1) { border-left: .55rem solid var(--color-speed-slow); padding-left: .6rem; }
+.pit-legend > :nth-child(2), .pit-map-legend > :nth-child(2) { border-left: .55rem solid var(--color-speed-medium); padding-left: .6rem; }
+.pit-legend > :nth-child(3), .pit-map-legend > :nth-child(3) { border-left: .55rem solid var(--color-speed-fast); padding-left: .6rem; }
+.pit-guide-link { display: inline-flex; align-items: center; gap: .5rem; align-self: start; color: var(--color-text-secondary); text-decoration: underline; text-underline-offset: .3rem; font-size: .875rem; }
+.pit-guide-link:hover { color: var(--color-text-primary); }
+
+.pit-workspace { display: grid; grid-template-columns: minmax(0, 1fr) minmax(18rem, 21rem); gap: 1.25rem; align-items: start; }
+.pit-map-panel { min-width: 0; border: 1px solid var(--color-border); background: var(--color-background-surface); }
+.pit-map-toolbar { padding: 1.1rem 1.25rem; border-bottom: 1px solid var(--color-border); }
+.pit-map-toolbar h2, .pit-panel-heading h2 { font-size: 1rem; font-weight: 700; }
+.pit-map { min-height: 34rem; }
+.pit-map-canvas { height: 34rem; width: 100%; }
+.pit-map .leaflet-container { background: var(--color-background-surface); }
+.pit-map-legend { padding: 1rem 1.25rem; border-top: 1px solid var(--color-border); }
+.pit-tower { border: 1px solid var(--color-border); background: var(--color-background-surface); }
+.pit-panel-heading { justify-content: space-between; padding: 1.1rem 1.25rem; border-bottom: 1px solid var(--color-border); }
+.pit-panel-heading [data-type="supporting"] { font-size: .65rem; letter-spacing: .08em; }
+.pit-tower-list { margin: 0; }
+.pit-tower-row { padding: .8rem 1.25rem; border-bottom: 1px solid var(--color-border); }
+.pit-tower-row dt { color: var(--color-text-secondary); }
+.pit-tower-row dd { margin: 0; color: var(--color-text-primary); font-family: var(--font-family-code); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pit-tower-lead { background: color-mix(in oklab, var(--color-accent) 12%, var(--color-background-surface)); padding-block: 1.15rem; }
+.pit-tower-lead dd { font-size: 1.3rem; }
+.pit-note { padding: .6rem 1.25rem 1.2rem; line-height: 1.45; }
+.pit-sectors { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 0; margin: 0; list-style: none; border: 1px solid var(--color-border); background: var(--color-background-surface); }
+.pit-sector { padding: 1.5rem; border-right: 1px solid var(--color-border); border-top: .25rem solid; }
+.pit-sector:last-child { border-right: 0; }
+.pit-sector-slow { border-top-color: var(--color-speed-slow); }
+.pit-sector-medium { border-top-color: var(--color-speed-medium); }
+.pit-sector-fast { border-top-color: var(--color-speed-fast); }
+.pit-sector [data-type="large"] { font-family: var(--font-family-code); font-variant-numeric: tabular-nums; }
+.pit-unavailable { padding: 1.5rem; border: 1px solid var(--color-border); color: var(--color-text-secondary); }
+.pit-file-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: 2rem; }
+.pit-file-details h2 { font-size: 1rem; }
+.pit-detail-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--color-border); }
+.pit-detail-list li { display: flex; justify-content: space-between; gap: 1rem; padding: .9rem 0; border-bottom: 1px solid var(--color-border); }
+.pit-detail-list li > :last-child { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pit-error { padding: 1rem 1.25rem; color: var(--color-text-primary); background: color-mix(in oklab, var(--color-accent) 15%, var(--color-background-surface)); border: 1px solid var(--color-accent); }
+.pit-footer { padding-block: 1.5rem; border-top: 1px solid var(--color-border); background: var(--color-background-body); }
+.pit-footer [data-type="supporting"] { font-size: .75rem; }
+
+/* Export guide: a reading surface in the same Pit Wall system. */
+.pit-guide-page { min-height: calc(100vh - 9rem); background: var(--color-background-body); color: var(--color-text-primary); }
+.pit-guide-container { padding-block: 2.5rem 5rem; }
+.pit-guide-back { display: inline-flex; align-items: center; gap: .5rem; width: fit-content; color: var(--color-text-secondary); text-decoration: none; font-size: .875rem; font-weight: 600; }
+.pit-guide-back:hover { color: var(--color-text-primary); }
+.pit-guide-intro { padding-bottom: 1.75rem; border-bottom: 1px solid var(--color-border); }
+.pit-guide-intro h1 { font-size: clamp(2rem, 3.5vw, 3rem); letter-spacing: -.035em; }
+.pit-guide-intro [data-type="body"] { max-width: 65ch; color: var(--color-text-secondary); line-height: 1.6; }
+.pit-guide-workspace { display: grid; grid-template-columns: minmax(0, 1fr) minmax(17rem, 21rem); align-items: start; gap: 1.25rem; }
+.pit-guide-main { min-width: 0; border: 1px solid var(--color-border); background: var(--color-background-surface); }
+.pit-guide-tabs-heading { padding: 1.4rem 1.6rem .75rem; }
+.pit-guide-tabs-heading h2, .pit-guide-rail h2, .pit-guide-faq h2 { font-size: 1.15rem; }
+.pit-guide-tabs-heading [data-type="supporting"] { color: var(--color-text-secondary); }
+.pit-guide-main .astryx-tab-list { max-width: 100%; }
+.pit-guide-instructions { padding: 1.75rem 1.6rem 2rem; }
+.pit-guide-instructions h2 { font-size: 1.5rem; letter-spacing: -.025em; }
+.pit-guide-instructions [data-type="supporting"] { color: var(--color-text-secondary); }
+.pit-guide-description { max-width: 65ch; line-height: 1.6; color: var(--color-text-secondary); }
+.pit-guide-steps { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--color-border); }
+.pit-guide-steps li { display: grid; grid-template-columns: 2.5rem minmax(0, 1fr); gap: .6rem; padding-block: 1.25rem; border-bottom: 1px solid var(--color-border); }
+.pit-guide-step-number { font-family: var(--font-family-code); color: var(--color-accent); padding-top: .2rem; }
+.pit-guide-steps li [data-type="body"] { line-height: 1.55; max-width: 65ch; }
+.pit-guide-device { color: var(--color-text-secondary); }
+.pit-guide-step-detail { max-width: 65ch; color: var(--color-text-secondary); line-height: 1.5; }
+.pit-guide-tip { display: grid; gap: .55rem; padding: 1.25rem 1.4rem; border: 1px solid var(--color-border); background: var(--color-background-body); }
+.pit-guide-tip [data-type="label"] { color: var(--color-accent); }
+.pit-guide-tip [data-type="body"] { line-height: 1.55; }
+.pit-guide-rail { padding: 1.6rem; border: 1px solid var(--color-border); background: var(--color-background-surface); }
+.pit-guide-rail-icon { color: var(--color-accent); }
+.pit-guide-rail [data-type="body"] { color: var(--color-text-secondary); line-height: 1.55; }
+.pit-guide-fields { display: grid; grid-template-columns: 1fr; gap: .2rem; margin: 0; padding-block: 1rem; border-block: 1px solid var(--color-border); }
+.pit-guide-fields dt { font-weight: 650; font-size: .875rem; margin-top: .65rem; }
+.pit-guide-fields dt:first-child { margin-top: 0; }
+.pit-guide-fields dd { margin: 0; color: var(--color-text-secondary); font-size: .875rem; }
+.pit-guide-privacy { color: var(--color-text-secondary); line-height: 1.45; }
+.pit-guide-privacy svg { flex: none; color: var(--color-accent); }
+.pit-guide-action { display: inline-flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .75rem 1rem; border-radius: var(--radius-element); background: var(--color-accent); color: var(--color-on-accent); text-decoration: none; font-weight: 700; }
+.pit-guide-action:hover { background: color-mix(in oklab, var(--color-accent) 85%, black); color: var(--color-on-accent); }
+.pit-guide-faq { border-top: 1px solid var(--color-border); padding-top: 2rem; }
+.pit-guide-faq-item { padding-block: 1.3rem; border-bottom: 1px solid var(--color-border); }
+.pit-guide-faq-item h3 { font-size: 1rem; }
+.pit-guide-faq-item [data-type="body"] { max-width: 68ch; color: var(--color-text-secondary); line-height: 1.6; }
+
+::selection { background: var(--color-accent); color: var(--color-on-accent); }
+:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+
+@media (max-width: 65rem) {
+  .pit-workspace { grid-template-columns: minmax(0, 1fr); }
+  .pit-tower-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pit-tower-row:nth-child(odd) { border-right: 1px solid var(--color-border); }
+  .pit-guide-workspace { grid-template-columns: minmax(0, 1fr); }
+  .pit-guide-rail { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+  .pit-guide-rail > :last-child { align-self: end; }
+}
+@media (max-width: 48rem) {
+  .pit-container, .pit-nav { width: min(100% - 2rem, 86rem); }
+  .pit-page > .pit-container { padding-block: 2rem 3rem; }
+  .pit-empty-grid { grid-template-columns: 1fr; }
+  .pit-dropzone { min-height: 22rem; border-right: 0; border-bottom: 1px dashed var(--color-border); padding: 2rem; }
+  .pit-preview-map { min-height: 13rem; max-height: 19rem; }
+  .pit-map, .pit-map-canvas { height: 24rem; min-height: 24rem; }
+  .pit-nav-link { font-size: .8rem; }
+  .pit-guide-container { padding-block: 1.5rem 3rem; }
+  .pit-guide-rail { display: flex; }
+  .pit-guide-tabs-heading, .pit-guide-instructions, .pit-guide-rail { padding-inline: 1.25rem; }
+}
+@media (max-width: 35rem) {
+  .pit-nav { gap: .5rem; }
+  .pit-brand { gap: .4rem; letter-spacing: 0; }
+  .pit-nav > :last-child { gap: .8rem; }
+  .pit-tower-list { grid-template-columns: 1fr; }
+  .pit-tower-row:nth-child(odd) { border-right: 0; }
+  .pit-sectors { grid-template-columns: 1fr; }
+  .pit-sector { border-right: 0; border-bottom: 1px solid var(--color-border); }
+  .pit-sector:last-child { border-bottom: 0; }
+  .pit-preview > :first-child { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pit-dropzone { transition: none; }
 }

@@ -114,20 +114,14 @@ export default function MapView({ tracks, className = '' }: MapViewProps) {
   }, [tracks, isReady])
 
   return (
-    <div className={`relative ${className}`} style={{ minHeight: '400px' }}>
+    <section className={`relative ${className}`}>
       {!isReady && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-[var(--f1-carbon)]">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <div className="size-5 animate-spin rounded-full border-2 border-[var(--f1-red)] border-t-transparent" />
-            <span className="font-mono text-sm">Loading map...</span>
-          </div>
-        </div>
+        <section className="absolute inset-0 z-10 flex items-center justify-center bg-background" role="status">Loading map…</section>
       )}
       <div
         ref={mapContainerRef}
-        className="h-96 w-full"
-        style={{ minHeight: '400px' }}
+        className="pit-map-canvas"
       />
-    </div>
+    </section>
   )
 }

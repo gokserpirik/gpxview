@@ -8,4 +8,13 @@ export default defineConfig({
     tailwindcss(),
   ],
   base: '/',
+  build: {
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [{ name: 'astryx', test: /node_modules[\\/]@astryxdesign[\\/]core/ }],
+        },
+      },
+    },
+  },
 })

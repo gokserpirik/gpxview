@@ -40,14 +40,14 @@ pnpm preview   # preview the built site
 
 ## 🚀 Deployment
 
-Built as a static site. Deploys automatically to **GitHub Pages** via GitHub Actions whenever the `mvp` branch is pushed.
+Built as a static site. The `redesign` branch deploys automatically to **GitHub Pages** via GitHub Actions. The previous version remains on the `mvp` branch.
 
 ### Manual deploy
 
-Push the `mvp` branch:
+Push the `redesign` branch:
 
 ```bash
-git push origin mvp
+git push origin redesign
 ```
 
 The `.github/workflows/deploy.yml` workflow builds and deploys to Pages.
@@ -75,19 +75,14 @@ Any GPX file from a GPS watch, phone app, or fitness tracker works. Files with e
 | Framework | React 19 + TypeScript 6 |
 | Build | Vite 8 |
 | Routing | react-router-dom |
-| Styling | Tailwind CSS v4 + CSS variables |
+| Styling | Astryx components and broadcast theme + Tailwind CSS v4 |
 | Maps | Leaflet + OpenStreetMap tiles |
 | GPX | Custom zero-dependency parser (browser DOMParser) |
 | Icons | lucide-react |
 
 ## 🎨 Design
 
-F1 TV broadcast-inspired dark theme:
-- Carbon black background (`oklch(0.08 0.005 20)`)
-- Ferrari-red accent (`oklch(0.55 0.22 30)`)
-- Speed colors: 🟡 yellow (slow) → 🟢 green (med) → 🟣 purple (fast)
-- Timing-tower stat panels with 2px red top border
-- Monospace for data, system sans-serif for headings
+Pit Wall is a map-first, F1 broadcast-inspired activity workspace. The empty state pairs a GPX drop target with a clearly illustrative route diagram; after upload, the real Leaflet map sits beside a compact timing tower. Equal-distance sectors sit below the route. The export guide shares the same visual system with source tabs and sequential export steps. The custom `broadcast` Astryx theme extends neutral with carbon surfaces, a red action color, and yellow/green/purple speed tokens.
 
 NOTE: For F1 fans, I know there are parts that actually doesn't align with the real broadcast (like the sector strip design). I took creative liberties to simplify and fit the web format while keeping the overall vibe.
 

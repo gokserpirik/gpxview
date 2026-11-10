@@ -1,10 +1,14 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import App from './App'
+import { Theme } from '@astryxdesign/core/theme'
 import './styles.css'
+import { themes, defaultThemeSlug } from './astryx-themes'
+import App from './App'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <Theme theme={themes[defaultThemeSlug]} mode="dark">
+      <App />
+    </Theme>
   </StrictMode>,
 )

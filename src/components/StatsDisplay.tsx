@@ -1,123 +1,87 @@
-import type { TrackStats } from '#/lib/gpx'
-import { formatDuration, computeSectors, SPEED_COLORS } from '#/lib/gpx'
-import type { GpxTrack } from '#/lib/gpx'
+import { Heading } from '@astryxdesign/core/Heading'
+import { HStack } from '@astryxdesign/core/HStack'
+import { Text } from '@astryxdesign/core/Text'
+import { VStack } from '@astryxdesign/core/VStack'
+import type { GpxTrack, TrackStats } from '#/lib/gpx'
+import { computeSectors, formatDuration, SPEED_COLORS } from '#/lib/gpx'
 
 interface StatsDisplayProps {
   stats: TrackStats
-  tracks?: GpxTrack[]
 }
 
-function fmt(val: number | null, suffix: string): string {
-  if (val === null) return '--'
-  return `${val} ${suffix}`
+const formatMeters = (value: number | null) => value === null ? '—' : `${value} m`
+const formatSpeed = (value: number) => value > 0 ? `${value.toFixed(1)} km/h` : '—'
+
+function formatPace(speedKmh: number): string {
+  if (speedKmh <= 0) return '—'
+  const totalSeconds = Math.round(3600 / speedKmh)
+  return `${Math.floor(totalSeconds / 60)}:${String(totalSeconds % 60).padStart(2, '0')} /km`
 }
 
-function fmtSpeed(val: number): string {
-  if (val <= 0) return '--'
-  return `${val.toFixed(1)}`
-}
-
-/** Single timing-tower panel: gray label on top, big white mono value below */
-function TimingPanel({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="border-t-2 border-[var(--f1-red)] bg-[var(--f1-panel)] p-3 rounded-sm">
-      <p className="text-[11px] font-mono font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-        {label}
-      </p>
-      <p className="text-2xl font-mono font-bold text-foreground truncate leading-tight mt-0.5">
-        {value}
-      </p>
-    </div>
-  )
-}
-
-export default function StatsDisplay({ stats, tracks }: StatsDisplayProps) {
-  const segments = tracks?.flatMap((t) => t.segments).filter((segment) => segment.length > 1) ?? []
-  const sectors = segments.length === 1
-    ? computeSectors(segments[0], 3)
-    : []
-
-  const mainStats = [
-    { label: 'Distance', value: `${stats.distanceKm.toFixed(2)} km` },
-    { label: 'Moving Time', value: stats.movingTime > 0 ? formatDuration(stats.movingTime) : '--' },
-    { label: 'Avg Speed', value: `${fmtSpeed(stats.avgSpeedKmh)} km/h` },
-    { label: 'Peak Speed*', value: `${fmtSpeed(stats.maxSpeedKmh)} km/h` },
-    { label: 'Elev Gain', value: fmt(stats.elevationGain, 'm') },
-    { label: 'Elev Loss', value: fmt(stats.elevationLoss, 'm') },
-    { label: 'Max Elev', value: fmt(stats.maxElevation, 'm') },
-    { label: 'Min Elev', value: fmt(stats.minElevation, 'm') },
-    { label: 'Avg Elev', value: fmt(stats.avgElevation, 'm') },
-    { label: 'Avg Pace', value: formatPace(stats.avgSpeedKmh) },
+export default function StatsDisplay({ stats }: StatsDisplayProps) {
+  const rows = [
+    { label: 'Distance', value: `${stats.distanceKm.toFixed(2)} km`, lead: true },
+    { label: 'Moving time', value: stats.movingTime > 0 ? formatDuration(stats.movingTime) : '—' },
+    { label: 'Average speed', value: formatSpeed(stats.avgSpeedKmh) },
+    { label: 'Peak speed*', value: formatSpeed(stats.maxSpeedKmh) },
+    { label: 'Average pace', value: formatPace(stats.avgSpeedKmh) },
+    { label: 'Elevation gain', value: formatMeters(stats.elevationGain) },
+    { label: 'Elevation loss', value: formatMeters(stats.elevationLoss) },
+    { label: 'Highest point', value: formatMeters(stats.maxElevation) },
+    { label: 'Lowest point', value: formatMeters(stats.minElevation) },
+    { label: 'Average elevation', value: formatMeters(stats.avgElevation) },
   ]
 
   return (
-    <div className="space-y-4">
-      {/* Main timing tower grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-px bg-border">
-        {mainStats.map((s) => (
-          <TimingPanel key={s.label} label={s.label} value={s.value} />
+    <VStack as="aside" gap={4} className="pit-tower" aria-label="Activity statistics">
+      <HStack gap={2} vAlign="center" className="pit-panel-heading">
+        <Heading level={2}>Timing tower</Heading>
+        <Text type="supporting">ACTIVITY DATA</Text>
+      </HStack>
+      <VStack as="dl" gap={0} className="pit-tower-list">
+        {rows.map((row) => (
+          <HStack as="div" key={row.label} gap={3} vAlign="center" hAlign="between" className={`pit-tower-row ${row.lead ? 'pit-tower-lead' : ''}`}>
+            <dt><Text type="supporting">{row.label}</Text></dt>
+            <dd><Text type={row.lead ? 'large' : 'body'} weight="semibold" hasTabularNumbers className="pit-value">{row.value}</Text></dd>
+          </HStack>
         ))}
-      </div>
-
-      <p className="text-xs text-muted-foreground">
-        *Peak speed is the median of the fastest 5% of valid intervals, not the absolute maximum.
-        Intervals of 2 minutes or longer and speeds over 200 km/h are excluded from speed and moving-time calculations.
-      </p>
-
-      {/* Sector timing strip — info row */}
-      {sectors.length > 0 && (
-        <div className="bg-[var(--f1-panel)] rounded-sm border border-border overflow-hidden">
-          <div className="flex divide-x divide-[var(--f1-red)]/40">
-            {sectors.map((s, i) => (
-              <div key={i} className="flex-1 px-3 py-2">
-                <p className="text-[10px] font-mono font-bold uppercase tracking-[0.12em] text-muted-foreground">
-                  SECTOR {i + 1}
-                </p>
-                <p className="text-sm font-mono text-foreground mt-0.5">
-                  {s.distanceKm.toFixed(2)} km
-                  <span className="mx-1.5 text-muted-foreground">·</span>
-                  {s.avgSpeedKmh > 0 ? `${s.avgSpeedKmh.toFixed(1)} km/h` : '--'}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          {/* Sector color bars — full width, colored by sector pace */}
-          <div className="flex h-2 w-full">
-            {sectors.map((s, i) => (
-              <div
-                key={i}
-                className="flex-1"
-                style={{ backgroundColor: s.color }}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* F1 color legend */}
-      <div className="flex items-center gap-4 justify-center">
-        <div className="flex items-center gap-1.5">
-          <span className="inline-block size-2.5 rounded-sm" style={{ backgroundColor: SPEED_COLORS.yellow }} />
-          <span className="text-[10px] font-mono text-muted-foreground">Slow</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="inline-block size-2.5 rounded-sm" style={{ backgroundColor: SPEED_COLORS.green }} />
-          <span className="text-[10px] font-mono text-muted-foreground">Medium</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="inline-block size-2.5 rounded-sm" style={{ backgroundColor: SPEED_COLORS.purple }} />
-          <span className="text-[10px] font-mono text-muted-foreground">Fast</span>
-        </div>
-      </div>
-    </div>
+      </VStack>
+      <Text type="supporting" display="block" className="pit-note">
+        *Peak speed is the median of the fastest 5% of valid intervals. Long gaps and implausible GPS jumps are excluded from speed and moving-time calculations.
+      </Text>
+    </VStack>
   )
 }
 
-function formatPace(speedKmh: number): string {
-  if (speedKmh <= 0) return '--'
-  const minPerKm = 60 / speedKmh
-  const min = Math.floor(minPerKm)
-  const sec = Math.round((minPerKm - min) * 60)
-  return `${min}:${String(sec).padStart(2, '0')} /km`
+export function SectorStrip({ tracks }: { tracks: GpxTrack[] }) {
+  const segments = tracks.flatMap((track) => track.segments).filter((segment) => segment.length > 1)
+  const sectors = segments.length === 1 ? computeSectors(segments[0], 3) : []
+
+  return (
+    <VStack as="section" gap={3} aria-label="Sector breakdown">
+      <HStack gap={3} vAlign="center" hAlign="between" wrap="wrap">
+        <Heading level={2}>Sector analysis</Heading>
+        <Text type="supporting">EQUAL-DISTANCE SPLITS</Text>
+      </HStack>
+      {sectors.length > 0 ? (
+        <VStack as="ol" gap={0} className="pit-sectors">
+          {sectors.map((sector, index) => (
+            <VStack as="li" gap={0} key={index} className={`pit-sector pit-sector-${sector.color === SPEED_COLORS.yellow ? 'slow' : sector.color === SPEED_COLORS.green ? 'medium' : 'fast'}`}>
+              <VStack gap={1}>
+                <Text type="label" color="secondary">SECTOR {index + 1}</Text>
+                <Text type="large" weight="semibold" hasTabularNumbers display="block">
+                  {sector.avgSpeedKmh > 0 ? `${sector.avgSpeedKmh.toFixed(1)} km/h` : '—'}
+                </Text>
+                <Text type="supporting" hasTabularNumbers>{sector.distanceKm.toFixed(2)} km</Text>
+              </VStack>
+            </VStack>
+          ))}
+        </VStack>
+      ) : (
+        <Text type="supporting" display="block" className="pit-unavailable">
+          Sector splits are available when the file contains one continuous track segment.
+        </Text>
+      )}
+    </VStack>
+  )
 }

@@ -15,6 +15,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@astryxdesign/core": "^0.7.11",
+    "@astryxdesign/theme-neutral": "^0.7.11",
+    "@stylexjs/stylex": "^0.19.1",
     "@tailwindcss/vite": "^4.1.18",
     "clsx": "^2.1.1",
     "leaflet": "^1.9.4",
@@ -28,6 +31,7 @@
     "tw-animate-css": "^1.3.6"
   },
   "devDependencies": {
+    "@astryxdesign/cli": "^0.7.11",
     "@types/leaflet": "^1.9.21",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",

@@ -1,6 +1,10 @@
 import { useCallback, useRef, useState } from 'react'
-import { Upload } from 'lucide-react'
-import { cn } from '#/lib/utils'
+import { ArrowUpRight } from 'lucide-react'
+import { Button } from '@astryxdesign/core/Button'
+import { HStack } from '@astryxdesign/core/HStack'
+import { Icon } from '@astryxdesign/core/Icon'
+import { Text } from '@astryxdesign/core/Text'
+import { VStack } from '@astryxdesign/core/VStack'
 
 interface FileDropZoneProps {
   onFile: (file: File) => void
@@ -8,90 +12,56 @@ interface FileDropZoneProps {
   disabled?: boolean
 }
 
-export default function FileDropZone({
-  onFile,
-  accept = '.gpx',
-  disabled = false,
-}: FileDropZoneProps) {
+export default function FileDropZone({ onFile, accept = '.gpx', disabled = false }: FileDropZoneProps) {
   const [isDragging, setIsDragging] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(true)
-  }, [])
-
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
+  const handleDrop = useCallback((event: React.DragEvent) => {
+    event.preventDefault()
     setIsDragging(false)
-  }, [])
-
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault()
-      setIsDragging(false)
-      const file = e.dataTransfer.files[0]
-      if (file) onFile(file)
-    },
-    [onFile],
-  )
-
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0]
-      if (file) onFile(file)
-    },
-    [onFile],
-  )
+    if (!disabled && event.dataTransfer.files[0]) onFile(event.dataTransfer.files[0])
+  }, [disabled, onFile])
 
   return (
-    <div
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') inputRef.current?.click()
-      }}
-      onClick={() => inputRef.current?.click()}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
+    <section
+      className={`pit-dropzone ${isDragging ? 'pit-dropzone-active' : ''}`}
+      onDragOver={(event) => { event.preventDefault(); if (!disabled) setIsDragging(true) }}
+      onDragLeave={(event) => { event.preventDefault(); setIsDragging(false) }}
       onDrop={handleDrop}
-      className={cn(
-        'relative cursor-pointer rounded-sm border-2 border-dashed p-12 text-center transition-all duration-200',
-        isDragging
-          ? 'border-[var(--f1-red)] bg-[var(--f1-red)]/5 scale-[1.02]'
-          : 'border-border hover:border-[var(--f1-red)]/50 hover:bg-muted/30',
-        disabled && 'pointer-events-none opacity-50',
-      )}
+      aria-label="GPX file drop area"
     >
       <input
         ref={inputRef}
         type="file"
         accept={accept}
-        className="hidden"
-        onChange={handleChange}
+        className="sr-only"
+        tabIndex={-1}
+        onChange={(event) => {
+          const file = event.target.files?.[0]
+          if (file) onFile(file)
+          event.target.value = ''
+        }}
         disabled={disabled}
+        aria-label="Choose a GPX file"
       />
-
-      <div className="flex flex-col items-center gap-4">
-        <div
-          className={cn(
-            'flex size-16 items-center justify-center rounded-sm transition-colors',
-            isDragging
-              ? 'bg-[var(--f1-red)] text-white'
-              : 'bg-muted text-muted-foreground',
-          )}
-        >
-          <Upload className="size-7" />
-        </div>
-        <div>
-          <p className="text-lg font-medium text-foreground font-sans">
-            {isDragging ? 'Drop your GPX file here' : 'Drop a GPX file here'}
-          </p>
-          <p className="mt-1 text-sm text-muted-foreground font-mono">
-            or click to browse — <code className="text-xs">.gpx</code> files only
-          </p>
-        </div>
-      </div>
-    </div>
+      <VStack gap={6}>
+        <VStack gap={2}>
+          <Text type="display-3" display="block">Your route starts here.</Text>
+          <Text type="body" color="secondary" display="block">
+            Drop a GPX file to review your route, pace and sector performance. Your file stays in this browser.
+          </Text>
+        </VStack>
+        <HStack gap={4} vAlign="center" wrap="wrap">
+          <Button
+            label="Choose GPX file"
+            variant="primary"
+            icon={<Icon icon="upload" size="sm" />}
+            onClick={() => inputRef.current?.click()}
+            isDisabled={disabled}
+          />
+          <Text type="supporting">or drop it anywhere in this panel <Icon icon={ArrowUpRight} size="xsm" /></Text>
+        </HStack>
+      </VStack>
+    </section>
   )
 }
